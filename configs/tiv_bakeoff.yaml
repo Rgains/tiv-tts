@@ -1,0 +1,29 @@
+seed: 20260730
+audit_csv: outputs/dataset_audit/samples.csv
+audit_json: outputs/dataset_audit/audit.json
+signal_quality_csv: outputs/dataset_audit/signal_quality.csv
+output_dir: data/interim/tiv_bakeoff
+
+selection:
+  source_group: tts_Tiv_dataset_20_175clips_1866s_20260418-1226
+  sample_count: 60
+  train_count: 50
+  validation_count: 5
+  test_count: 5
+  minimum_duration_seconds: 2.0
+  maximum_duration_seconds: 10.0
+  require_no_signal_warnings: true
+  minimum_corpus_character_count: 5
+
+audio:
+  sample_rate: 22050
+
+comparison:
+  candidates:
+    - vits
+    - matcha_tts
+  local_max_steps: 50
+  seed: 20260730
+  identical_splits: true
+  character_input: true
+  pretrained_weights: false
