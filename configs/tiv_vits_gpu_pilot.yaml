@@ -1,0 +1,31 @@
+seed: 20260730
+audit_csv: /home/ubuntu/tiv-tts/artifacts/dataset-audit-verify/samples.csv
+audit_json: /home/ubuntu/tiv-tts/artifacts/dataset-audit-verify/audit.json
+signal_quality_csv: /home/ubuntu/tiv-tts/artifacts/dataset-audit-verify/signal_quality.csv
+output_dir: /home/ubuntu/tiv-tts/artifacts/vits-pilot-data
+
+selection:
+  source_group: tts_Tiv_dataset_20_175clips_1866s_20260418-1226
+  sample_count: 113
+  train_count: 93
+  validation_count: 10
+  test_count: 10
+  minimum_duration_seconds: 2.0
+  maximum_duration_seconds: 10.0
+  require_no_signal_warnings: true
+  minimum_corpus_character_count: 5
+
+audio:
+  sample_rate: 22050
+
+comparison:
+  seed: 20260730
+
+pilot:
+  batch_size: 8
+  eval_batch_size: 8
+  epochs: 90
+  save_step: 200
+  save_n_checkpoints: 2
+  print_step: 20
+  mixed_precision: false

@@ -1,0 +1,31 @@
+seed: 202604
+dataset_root: /home/ubuntu/tiv-tts/repo/tiv-tts/data/raw
+audit_csv: /home/ubuntu/tiv-tts/artifacts/dataset-audit/samples.csv
+work_dir: /home/ubuntu/tiv-tts/artifacts/smoke-dataset
+output_dir: /home/ubuntu/tiv-tts/checkpoints/tiv-smoke-tinytts
+
+data:
+  sample_count: 10
+  source_group: null
+  minimum_duration_seconds: 2.0
+  maximum_duration_seconds: 6.0
+
+audio:
+  sample_rate: 22050
+  n_fft: 1024
+  hop_length: 256
+  n_mels: 80
+  f_min: 0.0
+  f_max: 8000.0
+  griffin_lim_iterations: 16
+
+model:
+  embedding_dim: 48
+  hidden_dim: 64
+
+training:
+  batch_size: 2
+  learning_rate: 0.002
+  initial_steps: 30
+  resume_steps: 5
+  log_every: 5

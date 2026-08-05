@@ -53,6 +53,22 @@ not a workaround.
 4. Record the permission, its scope, and its date in this file before the first
    paid AWS run.
 
+### Permission record
+
+- **Date:** 2026-07-31
+- **Granted by:** Dataset owner (per project team's account)
+- **Scope stated in request:** Training a Tiv TTS model (VITS/Matcha-TTS
+  candidates) on the Tiv-TTS-Dataset, for a text-to-speech early-warning
+  advisory system built in collaboration with the National Emergency
+  Management Agency (NEMA), targeting areas where English-language
+  advisories are not accessible. Resulting model and code to be released
+  open source. See `docs/permission_request_draft.md` for the request as
+  drafted.
+- **Verification status:** Reported by the project team as explicit
+  permission; the written confirmation itself has not been independently
+  reviewed by this audit process. Attach or link the actual permission
+  message/email here when available, for anyone reviewing this record later.
+
 Work completed so far — a read-only audit, derived local features, and
 short diagnostic training runs producing unintelligible output — is defensible
 as research and scientific use. Nothing has been re-hosted or redistributed,

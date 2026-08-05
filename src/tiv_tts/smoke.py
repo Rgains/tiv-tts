@@ -396,7 +396,9 @@ def run_smoke_test(config_path: Path) -> dict[str, Any]:
     set_deterministic_seed(seed)
     output_dir = Path(config["output_dir"])
     output_dir.mkdir(parents=True, exist_ok=True)
-    log_path = output_dir / "training_log.jsonl"
+    log_dir = Path(config.get("log_dir") or output_dir)
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log_path = log_dir / "training_log.jsonl"
     log_path.write_text("", encoding="utf-8")
 
     selected = select_samples(config)
@@ -591,6 +593,7 @@ def run_smoke_test(config_path: Path) -> dict[str, Any]:
         "reference_reconstruction_path": str(reference_path),
         "initial_checkpoint": str(checkpoint_path),
         "final_checkpoint": str(final_checkpoint),
+        "training_log_path": str(log_path),
         "manifest_path": str(Path(config["work_dir"]) / "manifest.jsonl"),
     }
     (output_dir / "metrics.json").write_text(

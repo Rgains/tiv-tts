@@ -1,0 +1,30 @@
+seed: 20260730
+audit_csv: /home/ubuntu/tiv-tts/artifacts/dataset-audit-verify/samples.csv
+audit_json: /home/ubuntu/tiv-tts/artifacts/dataset-audit-verify/audit.json
+signal_quality_csv: /home/ubuntu/tiv-tts/artifacts/dataset-audit-verify/signal_quality.csv
+output_dir: /home/ubuntu/tiv-tts/artifacts/vits-full-data
+
+selection:
+  source_groups: null   # null = use all 14 export groups (single-speaker corpus)
+  sample_count: 1176
+  train_count: 1096
+  validation_count: 40
+  test_count: 40
+  minimum_duration_seconds: 1.5
+  maximum_duration_seconds: 15.0
+  require_no_signal_warnings: true
+
+audio:
+  sample_rate: 22050
+
+comparison:
+  seed: 20260730
+
+training:
+  batch_size: 16
+  eval_batch_size: 16
+  epochs: 1500
+  save_step: 500
+  save_n_checkpoints: 5
+  print_step: 50
+  mixed_precision: false
