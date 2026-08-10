@@ -5,7 +5,7 @@ Generated: 2026-07-30T06:10:37.994314+00:00
 ## CURRENT STATE
 
 - Repository: No existing source code, Git repository, README, configuration, or dependency manifest was present at inspection time. The audit script is the first project code added.
-- Dataset: `Tiv-TTS-Dataset/ (repository root)` contains 14 source-group exports.
+- Dataset: `Tiv-TTS-Dataset/` at the repository root contains 14 source-group exports.
 - Framework: No TTS framework or pretrained model has been selected or installed.
 - Environment: Python 3.14.3; audio metadata probed with `afinfo`. PyTorch, torchaudio, FFmpeg, and common Python audio packages were not present at inspection time.
 - Risks: Speaker/session identity is unverified; licence and consent are unverified; waveform-level quality remains unassessed; the directory is not currently a Git repository.

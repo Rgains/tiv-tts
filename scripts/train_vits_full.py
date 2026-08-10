@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import shutil
 import time
 from pathlib import Path
@@ -308,14 +309,15 @@ def main() -> int:
     parser.add_argument(
         "--config", type=Path, default=Path("configs/tiv_vits_full.yaml")
     )
+    # TIV_WORK_ROOT lets the training host set its own layout; the default
+    # matches the EC2 box these runs were executed on.
+    work_root = Path(os.environ.get("TIV_WORK_ROOT", "/home/ubuntu/tiv-tts"))
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=Path("/home/ubuntu/tiv-tts/checkpoints/vits-full"),
+        default=work_root / "checkpoints/vits-full",
     )
-    parser.add_argument(
-        "--log-dir", type=Path, default=Path("/home/ubuntu/tiv-tts/logs")
-    )
+    parser.add_argument("--log-dir", type=Path, default=work_root / "logs")
     parser.add_argument("--epochs", type=int)
     parser.add_argument("--batch-size", type=int)
     parser.add_argument(
