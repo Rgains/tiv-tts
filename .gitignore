@@ -18,3 +18,7 @@ data/interim/
 
 Tiv-TTS-Dataset/
 
+
+# Model artifacts are published to the Hub, not committed here.
+/model/
+/samples/

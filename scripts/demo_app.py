@@ -9,6 +9,7 @@ best_model.pth). Intended for a listening-review demo, not production serving.
 from __future__ import annotations
 
 import io
+import os
 from pathlib import Path
 
 import numpy as np
@@ -20,10 +21,13 @@ from TTS.config import load_config
 from TTS.tts.models.vits import Vits
 from TTS.tts.utils.text import cleaners as coqui_cleaners
 
-DEFAULT_CHECKPOINT = Path(
+REPO_ROOT = Path(__file__).resolve().parents[1]
+EC2_RUN = Path(
     "/home/ubuntu/tiv-tts/checkpoints/vits-full/"
-    "tiv_vits_full-July-31-2026_04+37PM-4834afa/best_model.pth"
+    "tiv_vits_full-July-31-2026_04+37PM-4834afa"
 )
+HF_REPO_ID = os.environ.get("TIV_HF_REPO", "ejnuma/tiv-tts")
+CHECKPOINT_NAME = "best_model.pth"
 
 EXAMPLE_SENTENCES = [
     "Kpa ior kpishi hemba soon er a yila wan iti er Korwua",
@@ -41,9 +45,66 @@ def tiv_character_cleaner(text: str) -> str:
 setattr(coqui_cleaners, "tiv_character_cleaner", tiv_character_cleaner)
 
 
+LFS_POINTER_MAGIC = b"version https://git-lfs.github.com/spec/v1"
+
+
+def checkpoint_problem(checkpoint: Path) -> str | None:
+    """Return a readable reason the checkpoint cannot be loaded, or None if it can."""
+    if not checkpoint.exists():
+        return (
+            f"No checkpoint at {checkpoint}. Point TIV_RUN_DIR at a directory "
+            f"holding config.json and {CHECKPOINT_NAME}."
+        )
+    with checkpoint.open("rb") as handle:
+        head = handle.read(len(LFS_POINTER_MAGIC))
+    if head == LFS_POINTER_MAGIC:
+        return (
+            f"{checkpoint} is an unresolved Git LFS pointer of "
+            f"{checkpoint.stat().st_size} bytes, not the model itself. The host "
+            "cloned this repository without Git LFS support, or the repository is "
+            "over its LFS bandwidth quota."
+        )
+    return None
+
+
+def hub_token() -> str | None:
+    """Read the Hub token from the environment, falling back to Streamlit secrets."""
+    token = os.environ.get("HF_TOKEN")
+    if token:
+        return token
+    try:
+        return st.secrets["HF_TOKEN"]
+    except Exception:
+        # No secrets file locally, or the key is absent on the host.
+        return None
+
+
+@st.cache_resource(show_spinner="Fetching the model from the Hub...")
+def fetch_from_hub() -> Path:
+    """Download config and checkpoint from the Hub, returning their shared directory."""
+    from huggingface_hub import hf_hub_download
+
+    token = hub_token()
+    config = hf_hub_download(HF_REPO_ID, "config.json", token=token)
+    hf_hub_download(HF_REPO_ID, CHECKPOINT_NAME, token=token)
+    return Path(config).parent
+
+
+def resolve_run_dir() -> Path:
+    """TIV_RUN_DIR, then the local model/ copy, then the EC2 run, then the Hub."""
+    override = os.environ.get("TIV_RUN_DIR")
+    if override:
+        return Path(override)
+    for candidate in (REPO_ROOT / "model", EC2_RUN):
+        if (candidate / "config.json").exists():
+            return candidate
+    return fetch_from_hub()
+
+
 @st.cache_resource
 def load_model(checkpoint_str: str) -> Vits:
     checkpoint = Path(checkpoint_str)
+    torch.set_num_threads(int(os.environ.get("TIV_THREADS", "4")))
     config_path = checkpoint.parent / "config.json"
     if not config_path.is_file():
         raise FileNotFoundError(f"Missing VITS configuration: {config_path}")
@@ -85,7 +146,13 @@ def main() -> None:
         "exactly what this demo is for."
     )
 
-    model = load_model(str(DEFAULT_CHECKPOINT))
+    checkpoint = resolve_run_dir() / CHECKPOINT_NAME
+    problem = checkpoint_problem(checkpoint)
+    if problem:
+        st.error(problem)
+        st.stop()
+
+    model = load_model(str(checkpoint))
 
     if "text_input" not in st.session_state:
         st.session_state.text_input = EXAMPLE_SENTENCES[0]
