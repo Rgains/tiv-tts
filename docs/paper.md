@@ -249,7 +249,6 @@ into this repository:
 - Architecture comparison: `docs/model_bakeoff_protocol.md`,
   `docs/model_bakeoff_results.md`
 - Training log (all stages): `docs/training_log.md`
-- Full narrative session log: `docs/session_log.md`
 - Full training config/script: `configs/tiv_vits_full.yaml`,
   `scripts/train_vits_full.py`
 - Final checkpoint metrics: `checkpoints/vits-full/tiv_vits_full-July-31-2026_04+37PM-4834afa/metrics.json`
