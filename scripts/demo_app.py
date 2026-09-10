@@ -28,6 +28,7 @@ EC2_RUN = Path(
 )
 HF_REPO_ID = os.environ.get("TIV_HF_REPO", "ejnuma/tiv-tts")
 CHECKPOINT_NAME = "best_model.pth"
+MAX_INPUT_CHARS = int(os.environ.get("TIV_MAX_CHARS", "150"))
 
 EXAMPLE_SENTENCES = [
     "Kpa ior kpishi hemba soon er a yila wan iti er Korwua",
@@ -104,7 +105,7 @@ def resolve_run_dir() -> Path:
 @st.cache_resource
 def load_model(checkpoint_str: str) -> Vits:
     checkpoint = Path(checkpoint_str)
-    torch.set_num_threads(int(os.environ.get("TIV_THREADS", "4")))
+    torch.set_num_threads(int(os.environ.get("TIV_THREADS", "2")))
     config_path = checkpoint.parent / "config.json"
     if not config_path.is_file():
         raise FileNotFoundError(f"Missing VITS configuration: {config_path}")
@@ -164,11 +165,28 @@ def main() -> None:
         if col.button(short, help=sentence, use_container_width=True):
             st.session_state.text_input = sentence
 
-    text = st.text_area("Tiv text", key="text_input", height=100)
+    # VITS allocates in proportion to sequence length, so the input length is
+    # a memory limit, not just a UX one. Measured on CPU with the stripped
+    # checkpoint: a loaded model sits near 1.3 GB, and synthesis adds roughly
+    # 230 MB plus 5.7 MB per character on top of that. At 200 characters the
+    # process peaks around 2.7 GB, which is the whole container budget, so the
+    # default cap is set well below where one long paste takes the demo down.
+    text = st.text_area(
+        "Tiv text",
+        key="text_input",
+        height=100,
+        max_chars=MAX_INPUT_CHARS,
+        help=f"Up to {MAX_INPUT_CHARS} characters per synthesis.",
+    )
 
     if st.button("Synthesize", type="primary"):
         if not text.strip():
             st.warning("Enter some Tiv text first.")
+        elif len(text) > MAX_INPUT_CHARS:
+            st.error(
+                f"Keep the text at or below {MAX_INPUT_CHARS} characters "
+                f"({len(text)} given)."
+            )
         else:
             try:
                 with st.spinner("Synthesizing..."):
